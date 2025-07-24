@@ -1,7 +1,7 @@
 import Layout from "./Layout";
 import Welcome from "../Welcome";
 import { useEffect } from "react";
-import  useUserStore  from "../../stores/userStore";
+import useUserStore from "../../stores/userStore";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 export default function Dashbord() {

@@ -1,9 +1,12 @@
+// src/services/axiosInstance.js
 import axios, { AxiosHeaders } from "axios";
 
-const API_URL = import.meta.env.VITE_API_BASE_URL;
-
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: "/api", // Utilise le proxy défini dans vite.config.js
+  withCredentials: true, // Nécessaire pour envoyer les cookies/credentials
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Intercepteur pour ajouter le token dans les headers de chaque requête
@@ -23,6 +26,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     // Gestion des erreurs de requête
+    console.error("Erreur dans l'intercepteur de requête:", error);
     return Promise.reject(error);
   }
 );
@@ -33,17 +37,27 @@ axiosInstance.interceptors.response.use(
     return response; // Renvoie la réponse si tout est ok
   },
   (error) => {
-    // Gère les erreurs de réponse (par exemple, 401 Unauthorized ou 500 Internal Server Error)
+    // Gère les erreurs de réponse
     if (error.response) {
-      // Erreur côté serveur ou en raison de l'authentification
       if (error.response.status === 401) {
         console.error("Non autorisé. Token expiré ou invalide.");
-        // Tu peux gérer la redirection vers la page de login ici si nécessaire
+        localStorage.removeItem("token"); // Supprime le token si non autorisé
+        // Redirection vers la page de login (à implémenter selon ton router)
+        // Exemple : window.location.href = "/login";
       } else if (error.response.status === 500) {
         console.error("Erreur serveur. Veuillez réessayer plus tard.");
+      } else {
+        console.error(
+          "Erreur serveur:",
+          error.response.data.message || error.response.status
+        );
       }
+    } else if (error.request) {
+      console.error(
+        "Erreur réseau: Aucune réponse reçue. Vérifiez votre connexion."
+      );
     } else {
-      console.error("Erreur inconnue. Vérifiez votre connexion internet.");
+      console.error("Erreur inconnue:", error.message);
     }
 
     return Promise.reject(error); // Renvoie l'erreur pour la gestion locale
