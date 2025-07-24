@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
       allowedHosts: env.VITE_ALLOWED_HOST ? [env.VITE_ALLOWED_HOST] : [],
       proxy: {
         "/api": {
-          target: "http://localhost:3000",
+          target: "https://neutral-abnormally-liger.ngrok-free.app",
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/api/, ""),
